@@ -1,0 +1,7 @@
+{
+  "name": "BPB - Build Perfect Body",
+  "description": "An intelligent AI fitness coach specializing in hypertrophy and fat loss through bodyweight training, tailored for beginners with an Egyptian nutritional focus.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
