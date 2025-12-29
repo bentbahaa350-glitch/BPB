@@ -1,4 +1,3 @@
-
 import { GoogleGenAI } from "@google/genai";
 
 const SYSTEM_INSTRUCTION = `
@@ -29,30 +28,35 @@ const SYSTEM_INSTRUCTION = `
 `;
 
 export class HamzaCoach {
-  private ai: any;
+  private ai: GoogleGenAI;
 
   constructor() {
-    this.ai = new GoogleGenAI({ apiKey: (process.env as any).API_KEY });
+    // استخدم نفس الاسم اللي في Vercel: GEMINI_API_KEY
+    const apiKey = (process.env as any).GEMINI_API_KEY || (process.env as any).API_KEY;
+    if (!apiKey) {
+      console.error("Missing GEMINI_API_KEY / API_KEY");
+    }
+    this.ai = new GoogleGenAI({ apiKey });
   }
 
   async getResponse(history: any[], latestMessage: string, images?: string[]) {
-    const model = 'gemini-3-flash-preview';
+    const model = "gemini-3.5-flash"; // موديل نص ثابت وحديث
     const parts: any[] = [{ text: latestMessage || "حلل هذه الصور يا بطل" }];
-    
+
     if (images && images.length > 0) {
-      images.forEach(base64 => {
+      images.forEach((base64) => {
         parts.push({
-          inlineData: { mimeType: 'image/jpeg', data: base64 }
+          inlineData: { mimeType: "image/jpeg", data: base64 },
         });
       });
     }
 
-    const contents = history.map(msg => ({
-      role: msg.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: msg.content }]
+    const contents = history.map((msg) => ({
+      role: msg.role === "assistant" ? "model" : "user",
+      parts: [{ text: msg.content }],
     }));
 
-    contents.push({ role: 'user', parts: parts });
+    contents.push({ role: "user", parts });
 
     const response = await this.ai.models.generateContent({
       model,
@@ -64,9 +68,18 @@ export class HamzaCoach {
   }
 
   async generateExerciseImage(exerciseName: string): Promise<string | null> {
+    // تم تعطيل توليد صور التمارين مؤقتًا بسبب مشكلة الكوتا على موديل الصور
+    console.warn(
+      "Image generation disabled (quota for gemini-2.5-flash-preview-image). Skipping:",
+      exerciseName
+    );
+    return null;
+
+    /*
+    // الكود الأصلي للاستخدام لاحقًا بعد حل الكوتا أو تفعيل billing:
     try {
       const response = await this.ai.models.generateContent({
-        model: 'gemini-2.5-flash-image',
+        model: "gemini-2.5-flash-preview-image",
         contents: {
           parts: [
             {
@@ -75,13 +88,15 @@ export class HamzaCoach {
           ],
         },
         config: {
-          imageConfig: { aspectRatio: "1:1" }
-        }
+          imageConfig: { aspectRatio: "1:1" },
+        },
       });
 
-      for (const part of response.candidates[0].content.parts) {
-        if (part.inlineData) {
-          return `data:image/png;base64,${part.inlineData.data}`;
+      const candidate = response.candidates?.[0];
+      const parts = candidate?.content?.parts || [];
+      for (const part of parts) {
+        if ((part as any).inlineData?.data) {
+          return `data:image/png;base64,${(part as any).inlineData.data}`;
         }
       }
       return null;
@@ -89,5 +104,6 @@ export class HamzaCoach {
       console.error("Image generation failed:", error);
       return null;
     }
+    */
   }
 }
