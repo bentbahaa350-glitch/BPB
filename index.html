@@ -5,7 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BPB - Build Perfect Body</title>
 
-    <!-- خط كايرو -->
+    <!-- Tailwind عبر CDN (مسموح في حالتك لأن مفيش build خطوة Tailwind) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              cairo: ["Cairo", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -14,17 +28,12 @@
       crossorigin="anonymous"
     />
 
-    <!-- استايلات أساسية (الباقي من Tailwind عبر Vite في index.css) -->
     <style>
       body {
         font-family: "Cairo", sans-serif;
-        background-color: #f8fafc;
-        color: #0f172a;
-        transition: background-color 0.3s ease, color 0.3s ease;
-      }
-      .dark body {
         background-color: #0f172a;
         color: #f8fafc;
+        transition: background-color 0.3s ease, color 0.3s ease;
       }
       .scrollbar-hide::-webkit-scrollbar {
         display: none;
@@ -52,7 +61,6 @@
       }
     </style>
 
-    <!-- import map لنسخ React / المكتبات من esm.sh كما في تمبلت Google AI Studio -->
     <script type="importmap">
       {
         "imports": {
@@ -65,12 +73,9 @@
         }
       }
     </script>
-
-    <!-- Vite هيضمّن CSS المبني (Tailwind وغيره) تلقائيًا -->
   </head>
   <body>
     <div id="root"></div>
-    <!-- نقطة الدخول بتاعت React/Vite من التمبلت ده -->
     <script type="module" src="/index.tsx"></script>
   </body>
 </html>
